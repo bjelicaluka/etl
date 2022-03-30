@@ -31,4 +31,4 @@ Sistem se sastoji od dve komponente zadužene za implementaciju ETL procesa, i k
 * Komponenta za CRUD operacije nad pravilima za transformaciju podataka. (Go)
 * Komponenta za vizualizaciju procesa. (React.js + socket.io)
 
-Dijagram možete videti na [stranici](https://github.com/bjelicaluka/etl/etl.png).
+Dijagram možete videti na [stranici](https://github.com/bjelicaluka/etl/blob/master/etl.png).
