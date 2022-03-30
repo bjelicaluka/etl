@@ -1,7 +1,7 @@
 # ETL
 Višenamenski sistem koji implementira <i>Extract Transform Load</i> proces uz podršku rada sa velikim brojem podataka.
 
-[Luka Bjelica, SW-21-2019](https://github.com/bjelicaluka)
+[Luka Bjelica, SW-21-2018](https://github.com/bjelicaluka)
 
 ## Opis Problema
 - ETL je proces sačinjen od izvlačenja (<i>Extract</i>), transformisanja (<i>Transform</i>), i učitavanja (<i>Load</i>) podataka. Poenta je ujediniti podatke sa više izvora, transformisati ih u odgovarajući format, i uskladištiti ih takve, po mogućnosti na drugom skladištu podataka.
