@@ -1,0 +1,71 @@
+Grammar:
+  statements+=Statement | Comment | Skip
+;
+
+Statement:
+  'take' op=TakeOperation target=ID where=Where? 'select' props+=MappedProperty[','] StatementEnd
+;
+
+TakeOperation:
+  'all'|'first'|'last'
+;
+
+MappedProperty:
+  src=Property 'as' target=Property | src=Property
+;
+
+Property:
+  /[^\d\W](\w|\.)*\b/
+;
+
+Where:
+  'where' exp=MultiLogExp
+;
+
+MultiLogExp:
+  left=LogExp op=LogOp right=LogExp | exp=LogExp
+;
+
+LogExp:
+  '(' lexp=LogExp ')' | left=RelExp op=LogOp right=LogExp | fn=FunctionCall | exp=RelExp
+;
+
+LogOp:
+  'and'|'or'
+;
+
+FunctionCall:
+  name=ID '(' parameters+=FunctionParameter[','] ')'
+;
+
+FunctionName:
+  'contains' | 'startswith' | 'endswith'
+;
+
+FunctionParameter:
+  prop=Property|lit=Literal
+;
+
+RelExp:
+  (left=Property|leftLit=Literal) op=RelOp (right=Property|rightLit=Literal)
+;
+
+RelOp:
+  '=='|'<='|'>='|'!='|'<'|'>'
+;
+
+Literal:
+  NUMBER | STRING
+;
+
+StatementEnd:
+  ';'
+;
+
+Comment:
+  /\/\/.*\n/
+;
+
+Skip:
+  /[\n\t\r]/
+;
