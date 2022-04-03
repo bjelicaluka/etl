@@ -1,35 +1,28 @@
+mod core;
+use crate::core::contract::StreamCreator;
+
+use std::error::Error;
+
+#[tokio::main]
+async fn test() -> Result<(), Box<dyn Error>> {
+    let resp = reqwest::get("https://httpbin.org/ip")
+        .await?
+        .text()
+        .await?;
+    println!("{:#?}", resp);
+    Ok(())
+}
+
 fn main() {
-    let mut a: i128 = 1;
-    let mut vec: Vec<i128> = Vec::new();
-    vec.push(a);
+    test();
 
-    change_val(&mut a);
+    let mut stream_creator = core::http::HttpStreamCreator::new();
 
-    for e in vec {
-        println!("{}", e)
+    loop {
+        let c = stream_creator.next();
+        if c == "" {
+            break
+        }
+        println!("{}", c);
     }
-
-    println!("Hello, world! {}", a);
-
-    for a in [1, 2, 3] {
-        println!("{}", a);
-    }
-
-    change_val(&mut a);
-
-    if a <= test(2) {
-        println!("ASD");
-    } else if a == 1 {
-        println!("BSDF");
-    } else {
-        println!("ELSE");
-    }
-}
-
-fn test(n: i128) -> i128 {
-    return n + 2;
-}
-
-fn change_val(n: &mut i128) {
-    *n = 20;
 }
