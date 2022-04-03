@@ -52,10 +52,18 @@ def endswith(target, arg):
     return False
 
 
+def exists(target):
+  try:
+    return target is not None
+  except:
+    return False
+
+
 built_in_fn_registry = {
   "contains": contains,
   "startswith": startswith,
   "endswith": endswith,
+  "exists": exists,
 }
 
 
@@ -69,8 +77,8 @@ def eval_multi_log_exp(exp, obj):
 def eval_log_exp(exp, obj):
   if exp.exp is not None:
     return eval_rel_exp(exp.exp, obj)
-  elif exp.lexp is not None:
-    return eval_log_exp(exp.lexp, obj)
+  elif exp.mexp is not None:
+    return eval_multi_log_exp(exp.mexp, obj)
   elif exp.fn is not None:
     return eval_fn_call(exp.fn, obj)
   else:

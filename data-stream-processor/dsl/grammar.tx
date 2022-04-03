@@ -1,5 +1,5 @@
 Grammar:
-  statements+=Statement | Comment | Skip
+  statements*=Statement | Comment | Skip
 ;
 
 Statement:
@@ -27,7 +27,7 @@ MultiLogExp:
 ;
 
 LogExp:
-  '(' lexp=LogExp ')' | left=RelExp op=LogOp right=LogExp | fn=FunctionCall | exp=RelExp
+  '(' mexp=MultiLogExp ')' | left=RelExp op=LogOp right=LogExp | fn=FunctionCall | exp=RelExp
 ;
 
 LogOp:
@@ -39,7 +39,7 @@ FunctionCall:
 ;
 
 FunctionName:
-  'contains' | 'startswith' | 'endswith'
+  'contains' | 'startswith' | 'endswith' | 'exists'
 ;
 
 FunctionParameter:

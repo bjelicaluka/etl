@@ -2,19 +2,9 @@ package main
 
 import (
 	"fmt"
-	"os/exec"
+	"stream-processor/src"
 	"sync"
 )
-
-func transform(stream string) (string, error) {
-	cmd := exec.Command("python", "./dsl/main.py", stream, "./dsl/grammar.tx", "./dsl/test.etl")
-	out, err := cmd.CombinedOutput()
-	if err != nil {
-		return "", err
-	} else {
-		return string(out), nil
-	}
-}
 
 func main() {
 	stream := `
@@ -37,8 +27,8 @@ func main() {
 	]
 	`
 
-	num := 1000
-	pool_size := 200
+	num := 100
+	pool_size := 20
 	stream_ch := make(chan string)
 
 	var wg sync.WaitGroup
@@ -48,9 +38,12 @@ func main() {
 		go func() {
 			defer wg.Done()
 			for stream := range stream_ch {
-				result, err := transform(stream)
+				result, err := src.Transform(stream, `
+				take first User where firstName == "Luka" and contains(list, 'L') select firstName, lastName;
+				`)
 				if err != nil {
 					fmt.Println(err)
+					fmt.Println(result)
 				} else {
 					fmt.Println(result)
 				}
