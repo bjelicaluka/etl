@@ -7,39 +7,20 @@ import (
 )
 
 func main() {
-	stream := `
-	[
-		{
-			"firstName": "Luka",
-			"lastName": "Bjelica"
-		},
-		{
-			"firstName": "Luka",
-			"lastName": "Test",
-			"list": [
-				"L"
-			]
-		},
-		{
-			"accountId": 1,
-			"name": "test"
-		}
-	]
-	`
-
-	num := 100
-	pool_size := 20
-	stream_ch := make(chan string)
-
 	var wg sync.WaitGroup
 
+	conn, ch, streams := src.InitChannel()
+	defer conn.Close()
+	defer ch.Close()
+
+	pool_size := 20
 	for i := 0; i < pool_size; i++ {
 		wg.Add(1)
 		go func() {
 			defer wg.Done()
-			for stream := range stream_ch {
-				result, err := src.Transform(stream, `
-				take first User where firstName == "Luka" and contains(list, 'L') select firstName, lastName;
+			for stream := range streams {
+				result, err := src.Transform(string(stream.Body), `
+				take first User where firstName == "Luka" and contains(list, 'L') select firstName as fname, lastName as nested.test;
 				`)
 				if err != nil {
 					fmt.Println(err)
@@ -50,12 +31,6 @@ func main() {
 			}
 		}()
 	}
-
-	for i := 0; i < num; i++ {
-		stream_ch <- stream
-	}
-
-	close(stream_ch)
 
 	wg.Wait()
 }
