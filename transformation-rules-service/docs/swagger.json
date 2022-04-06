@@ -1,0 +1,240 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "description": "This is a sample server celler server.",
+        "title": "Transformation Rules Service",
+        "contact": {},
+        "version": "1.0"
+    },
+    "host": "localhost:8000",
+    "basePath": "/api/v1",
+    "paths": {
+        "/transformation-rules": {
+            "get": {
+                "description": "Get all TransformationRules",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "TransformationRules"
+                ],
+                "summary": "Get all TransformationRules",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/types.TransformationRule"
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "description": "Create new TransformationRule",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "TransformationRules"
+                ],
+                "summary": "Create new TransformationRule",
+                "parameters": [
+                    {
+                        "description": "TransformationRule",
+                        "name": "transformationRule",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/types.AddTransformationRule"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/types.AddTransformationRule"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/types.Error"
+                        }
+                    }
+                }
+            }
+        },
+        "/transformation-rules/{id}": {
+            "get": {
+                "description": "Get TransformationRule by Id",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "TransformationRules"
+                ],
+                "summary": "Get TransformationRule by Id",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "TransformationRule Id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/types.TransformationRule"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/types.Error"
+                        }
+                    }
+                }
+            },
+            "put": {
+                "description": "Update existing TransformationRule",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "TransformationRules"
+                ],
+                "summary": "Update existing TransformationRule",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "TransformationRule Id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "TransformationRule",
+                        "name": "transformationRule",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/types.TransformationRule"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/types.TransformationRule"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/types.Error"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/types.Error"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "description": "Delete existing TransformationRule",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "TransformationRules"
+                ],
+                "summary": "Delete existing TransformationRule",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "TransformationRule Id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/types.TransformationRule"
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {
+                            "$ref": "#/definitions/types.Error"
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "types.AddTransformationRule": {
+            "type": "object",
+            "properties": {
+                "rules": {
+                    "type": "string",
+                    "example": "take one User where name == 'Luka' and startsWith(surname, 'Bje') select firstName as name, lastName as surname;"
+                }
+            }
+        },
+        "types.Error": {
+            "type": "object",
+            "properties": {
+                "message": {
+                    "type": "string",
+                    "example": "Something went wrong."
+                }
+            }
+        },
+        "types.TransformationRule": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "string",
+                    "example": "TransformationRules-123-A"
+                },
+                "rules": {
+                    "type": "string",
+                    "example": "take one User where name == 'Luka' and startsWith(surname, 'Bje') select firstName as name, lastName as surname;"
+                }
+            }
+        }
+    },
+    "securityDefinitions": {
+        "BasicAuth": {
+            "type": "basic"
+        }
+    }
+}

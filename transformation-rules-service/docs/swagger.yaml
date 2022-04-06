@@ -1,0 +1,161 @@
+basePath: /api/v1
+definitions:
+  types.AddTransformationRule:
+    properties:
+      rules:
+        example: take one User where name == 'Luka' and startsWith(surname, 'Bje')
+          select firstName as name, lastName as surname;
+        type: string
+    type: object
+  types.Error:
+    properties:
+      message:
+        example: Something went wrong.
+        type: string
+    type: object
+  types.TransformationRule:
+    properties:
+      id:
+        example: TransformationRules-123-A
+        type: string
+      rules:
+        example: take one User where name == 'Luka' and startsWith(surname, 'Bje')
+          select firstName as name, lastName as surname;
+        type: string
+    type: object
+host: localhost:8000
+info:
+  contact: {}
+  description: This is a sample server celler server.
+  title: Transformation Rules Service
+  version: "1.0"
+paths:
+  /transformation-rules:
+    get:
+      consumes:
+      - application/json
+      description: Get all TransformationRules
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/types.TransformationRule'
+            type: array
+      summary: Get all TransformationRules
+      tags:
+      - TransformationRules
+    post:
+      consumes:
+      - application/json
+      description: Create new TransformationRule
+      parameters:
+      - description: TransformationRule
+        in: body
+        name: transformationRule
+        required: true
+        schema:
+          $ref: '#/definitions/types.AddTransformationRule'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/types.AddTransformationRule'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/types.Error'
+      summary: Create new TransformationRule
+      tags:
+      - TransformationRules
+  /transformation-rules/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete existing TransformationRule
+      parameters:
+      - description: TransformationRule Id
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/types.TransformationRule'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/types.Error'
+      summary: Delete existing TransformationRule
+      tags:
+      - TransformationRules
+    get:
+      consumes:
+      - application/json
+      description: Get TransformationRule by Id
+      parameters:
+      - description: TransformationRule Id
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/types.TransformationRule'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/types.Error'
+      summary: Get TransformationRule by Id
+      tags:
+      - TransformationRules
+    put:
+      consumes:
+      - application/json
+      description: Update existing TransformationRule
+      parameters:
+      - description: TransformationRule Id
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: TransformationRule
+        in: body
+        name: transformationRule
+        required: true
+        schema:
+          $ref: '#/definitions/types.TransformationRule'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/types.TransformationRule'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/types.Error'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/types.Error'
+      summary: Update existing TransformationRule
+      tags:
+      - TransformationRules
+securityDefinitions:
+  BasicAuth:
+    type: basic
+swagger: "2.0"
