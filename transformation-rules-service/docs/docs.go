@@ -210,6 +210,10 @@ const docTemplate = `{
         "types.AddTransformationRule": {
             "type": "object",
             "properties": {
+                "name": {
+                    "type": "string",
+                    "example": "Custom ETL Rules"
+                },
                 "rules": {
                     "type": "string",
                     "example": "take one User where name == 'Luka' and startsWith(surname, 'Bje') select firstName as name, lastName as surname;"
@@ -231,6 +235,10 @@ const docTemplate = `{
                 "id": {
                     "type": "string",
                     "example": "TransformationRules-123-A"
+                },
+                "name": {
+                    "type": "string",
+                    "example": "Custom ETL Rules"
                 },
                 "rules": {
                     "type": "string",

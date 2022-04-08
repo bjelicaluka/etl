@@ -2,6 +2,9 @@ basePath: /api/v1
 definitions:
   types.AddTransformationRule:
     properties:
+      name:
+        example: Custom ETL Rules
+        type: string
       rules:
         example: take one User where name == 'Luka' and startsWith(surname, 'Bje')
           select firstName as name, lastName as surname;
@@ -17,6 +20,9 @@ definitions:
     properties:
       id:
         example: TransformationRules-123-A
+        type: string
+      name:
+        example: Custom ETL Rules
         type: string
       rules:
         example: take one User where name == 'Luka' and startsWith(surname, 'Bje')

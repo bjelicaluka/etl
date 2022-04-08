@@ -6,6 +6,7 @@ import (
 	"transformation-rules-service/service"
 	_ "transformation-rules-service/types"
 
+	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	ginSwagger "github.com/swaggo/gin-swagger"
 
@@ -27,6 +28,8 @@ func main() {
 	if err != nil {
 		return
 	}
+
+	r.Use(cors.Default())
 
 	v1 := r.Group("/api/v1")
 	{
