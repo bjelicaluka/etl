@@ -1,0 +1,4 @@
+/* Show jshint tooltip always on top */
+.CodeMirror-lint-tooltip {
+    z-index: 1000000;
+  }

@@ -1,0 +1,30 @@
+{
+	"name": "etl-frontend",
+	"version": "0.1.0",
+	"private": true,
+	"dependencies": {
+		"@codemirror/lang-javascript": "^0.19.7",
+		"@uiw/react-codemirror": "4.3.3",
+		"axios": "^0.21.1",
+		"moment": "^2.29.1",
+		"react": "^17.0.1",
+		"react-dom": "^17.0.1",
+		"react-flatpickr": "^3.10.6",
+		"react-router": "^5.2.0",
+		"react-router-dom": "^5.2.0",
+		"react-scripts": "^4.0.3",
+		"socket.io-client": "^3.0.4",
+		"typewriter-effect": "^2.18.0"
+	},
+	"scripts": {
+		"start": "chmod +x ./env.sh && bash env.sh && cp env-config.js ./public/ && rm env-config.js && react-scripts start",
+		"build": "react-scripts build",
+		"test": "react-scripts test",
+		"eject": "react-scripts eject"
+	},
+	"browserslist": [
+		">0.2%",
+		"not dead",
+		"not op_mini all"
+	]
+}
