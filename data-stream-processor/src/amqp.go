@@ -13,14 +13,14 @@ func failOnError(err error, msg string) {
 }
 
 func InitChannel() (*amqp.Connection, *amqp.Channel, <-chan amqp.Delivery) {
-	conn, err := amqp.Dial("amqp://uname:pwd@host:port/")
+	conn, err := amqp.Dial("amqp://root:isobarot1234@bjelicaluka.com:5672")
 	failOnError(err, "Failed to connect to RabbitMQ")
 
 	ch, err := conn.Channel()
 	failOnError(err, "Failed to open a channel")
 
 	exerr := ch.ExchangeDeclare(
-		"etl-stream",
+		"etl-data-stream",
 		amqp.ExchangeFanout,
 		true,
 		false, false, false, amqp.Table{})
@@ -29,7 +29,7 @@ func InitChannel() (*amqp.Connection, *amqp.Channel, <-chan amqp.Delivery) {
 	q, err := ch.QueueDeclare("etl-stream-processing", false, false, false, false, nil)
 	failOnError(err, "Failed to declare a queue")
 
-	qberr := ch.QueueBind(q.Name, "", "etl-stream", false, amqp.Table{})
+	qberr := ch.QueueBind(q.Name, "", "etl-data-stream", false, amqp.Table{})
 	failOnError(qberr, "Failed to bind a queue to an exchange")
 
 	msgs, err := ch.Consume(q.Name, "", true, false, false, false, nil)

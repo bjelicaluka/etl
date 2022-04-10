@@ -107,6 +107,9 @@ def dynamic_access(keyString, obj):
   curr = obj
   for i in range(len(keys)):
     key = keys[i]
+    if key == "_": continue
+    if type(curr) is list:
+      curr = {f"{i}": value for i, value in enumerate(curr)}
     if key in curr:
       curr = curr[key]
     else:

@@ -150,6 +150,32 @@ func TestTransformLogicalExpressionsExists(t *testing.T) {
 	testTransformFor(stream, rules, expected, t)
 }
 
+func TestTransformListElements(t *testing.T) {
+	stream := `[
+		{"list": [{"a": 1}]}
+	]`
+
+	rules := `
+		take first A where exists(list.0) select list.0 as elem;
+	`
+	expected := `[{'type': 'A', 'result': {'elem': {'a': 1}}}]`
+
+	testTransformFor(stream, rules, expected, t)
+}
+
+func TestTransformRootListElements(t *testing.T) {
+	stream := `[
+		[{"a": 1}]
+	]`
+
+	rules := `
+		take first A where exists(_.0) select _.0 as elem;
+	`
+	expected := `[{'type': 'A', 'result': {'elem': {'a': 1}}}]`
+
+	testTransformFor(stream, rules, expected, t)
+}
+
 func testTransformFor(stream string, rules string, expected string, t *testing.T) {
 	src.DslProjectPath = "../dsl"
 

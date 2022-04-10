@@ -20,7 +20,9 @@ func main() {
 			defer wg.Done()
 			for stream := range streams {
 				result, err := src.Transform(string(stream.Body), `
-				take first User where firstName == "Luka" and contains(list, 'L') select firstName as fname, lastName as nested.test;
+					take all Origins where startswith(origin, '188') and contains(origin, '115') select origin as host;
+					take first Breeds where exists(message) select message.african as list;
+					take first Quote where exists(_.0) select _.0 as quote;
 				`)
 				if err != nil {
 					fmt.Println(err)

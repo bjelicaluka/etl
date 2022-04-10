@@ -1,28 +1,22 @@
 mod core;
 use crate::core::contract::StreamCreator;
+use amiquip::Connection;
+use crate::core::contract::Publisher;
 
-use std::error::Error;
 
 #[tokio::main]
-async fn test() -> Result<(), Box<dyn Error>> {
-    let resp = reqwest::get("https://httpbin.org/ip")
-        .await?
-        .text()
-        .await?;
-    println!("{:#?}", resp);
-    Ok(())
-}
-
-fn main() {
-    test();
-
+async fn main() {
     let mut stream_creator = core::http::HttpStreamCreator::new();
 
+    let mut connection = Connection::insecure_open("amqp://root:isobarot1234@bjelicaluka.com:5672").expect("Failed to connect to AMQP Broker.");
+    let channel = connection.open_channel(None).expect("Failed to open a channel.");
+    
+    let mut amqp = core::amqp::AmqpPublisher::new("etl-data-stream", &channel);
+
     loop {
-        let c = stream_creator.next();
-        if c == "" {
-            break
-        }
-        println!("{}", c);
+        let stream = stream_creator.next().await;
+        println!("{}", stream);
+        amqp.publish(&stream);
+        println!("{}", "Sent");
     }
 }

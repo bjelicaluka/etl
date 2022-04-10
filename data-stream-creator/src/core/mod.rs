@@ -1,7 +1,9 @@
-/// Module declaration.
-pub mod http;
+/// Module declaration
 pub mod contract;
+pub mod http;
+pub mod amqp;
 
-/// Re-exporting the greeting function.
-pub use http::HttpStreamCreator;
+/// Re-exporting
 pub use contract::StreamCreator;
+pub use http::HttpStreamCreator;
+pub use amqp::AmqpPublisher;
