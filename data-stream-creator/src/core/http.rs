@@ -3,15 +3,21 @@ use crate::core::contract;
 use async_trait::async_trait;
 use futures::future::try_join_all;
 
-pub struct HttpStreamCreator { }
+pub struct HttpStreamCreator {
+  count: i64
+}
 
 #[async_trait]
 impl contract::StreamCreator for HttpStreamCreator {
-  fn new() -> HttpStreamCreator {
-    HttpStreamCreator { }
+  fn new(count: i64) -> HttpStreamCreator {
+    HttpStreamCreator { count }
   }
   
   async fn next(&mut self) -> String {
+    self.count -= 1;
+    if self.count == 0 {
+      return String::from("")
+    }
     let stream = try_join_all([
       http::get_async("https://httpbin.org/ip"),
       http::get_async("https://dog.ceo/api/breeds/list/all"),

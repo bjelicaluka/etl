@@ -7,3 +7,4 @@ pub mod amqp;
 pub use contract::StreamCreator;
 pub use http::HttpStreamCreator;
 pub use amqp::AmqpPublisher;
+pub use amqp::AmqpSubscriber;
