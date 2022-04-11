@@ -3,22 +3,17 @@ import { io } from 'socket.io-client';
 
 export class SocketIOClient {
 
-  constructor(host, namespace, path, tokenFactory, groupId, serviceHost) {
+  constructor(host, namespace, path, serviceHost) {
     this.host = host;
     this.serviceHost = serviceHost;
     this.namespace = namespace;
     this.path = path;
-    this.tokenFactory = tokenFactory;
-    this.groupId = groupId;
   }
 
   init() {
     this.client = io(`${this.host}${this.namespace}`, {
       path: this.path,
       forceNew: true,
-      query: {
-        token: `Bearer ${this.tokenFactory()}`
-      },
     });
 
     this.addEventListener('connect', () => {
@@ -56,7 +51,7 @@ export class SocketIOClient {
   }
 
   requestNamespaceCreation() {
-    axios.post(`${this.serviceHost}/groups/${this.groupId}/namespaces`, { namespace: this.namespace })
+    axios.post(`${this.serviceHost}/namespaces`, { namespace: this.namespace })
       .then(resp => { console.log("Namespace creation success."); this.init() })
       .catch(e => console.log('Namespace creation failed.'));
   }
