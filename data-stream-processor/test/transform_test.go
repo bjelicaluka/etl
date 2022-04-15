@@ -16,7 +16,7 @@ func TestTransformEmptyStreamAndRules(t *testing.T) {
 func TestTransformEmptyStream(t *testing.T) {
 	stream := `[]`
 	rules := `take first User select firstName;`
-	expected := `[{'type': 'User', 'result': []}]`
+	expected := `[{"type": "User", "result": []}]`
 
 	testTransformFor(stream, rules, expected, t)
 }
@@ -28,7 +28,7 @@ func TestTransformAllUserFirstName(t *testing.T) {
 	]`
 
 	rules := `take all User select firstName;`
-	expected := `[{'type': 'User', 'result': [{'firstName': 'Luka'}, {'firstName': 'Pera'}]}]`
+	expected := `[{"type": "User", "result": [{"firstName": "Luka"}, {"firstName": "Pera"}]}]`
 
 	testTransformFor(stream, rules, expected, t)
 }
@@ -40,7 +40,7 @@ func TestTransformAllUserFirstNameAsName(t *testing.T) {
 	]`
 
 	rules := `take all User select firstName as name;`
-	expected := `[{'type': 'User', 'result': [{'name': 'Luka'}, {'name': 'Pera'}]}]`
+	expected := `[{"type": "User", "result": [{"name": "Luka"}, {"name": "Pera"}]}]`
 
 	testTransformFor(stream, rules, expected, t)
 }
@@ -52,7 +52,7 @@ func TestTransformFirstUserFirstName(t *testing.T) {
 	]`
 
 	rules := `take first User select firstName;`
-	expected := `[{'type': 'User', 'result': {'firstName': 'Luka'}}]`
+	expected := `[{"type": "User", "result": {"firstName": "Luka"}}]`
 
 	testTransformFor(stream, rules, expected, t)
 }
@@ -64,7 +64,7 @@ func TestTransformLastUserFirstName(t *testing.T) {
 	]`
 
 	rules := `take last User select firstName;`
-	expected := `[{'type': 'User', 'result': {'firstName': 'Pera'}}]`
+	expected := `[{"type": "User", "result": {"firstName": "Pera"}}]`
 
 	testTransformFor(stream, rules, expected, t)
 }
@@ -78,10 +78,10 @@ func TestTransformMultipleStatements(t *testing.T) {
 	]`
 
 	rules := `
-		take all User where type == 'User' select firstName;
-		take all Account where type != 'User' select accountId;
+		take all User where type == "User" select firstName;
+		take all Account where type != "User" select accountId;
 	`
-	expected := `[{'type': 'User', 'result': [{'firstName': 'Luka'}, {'firstName': 'Pera'}]}, {'type': 'Account', 'result': [{'accountId': 1}, {'accountId': 2}]}]`
+	expected := `[{"type": "User", "result": [{"firstName": "Luka"}, {"firstName": "Pera"}]}, {"type": "Account", "result": [{"accountId": 1}, {"accountId": 2}]}]`
 
 	testTransformFor(stream, rules, expected, t)
 }
@@ -95,9 +95,9 @@ func TestTransformLogicalExpressions(t *testing.T) {
 	]`
 
 	rules := `
-		take all User where type == 'User' and startswith(firstName, "Lu") or endswith(lastName, "ic") select firstName;
+		take all User where type == "User" and startswith(firstName, "Lu") or endswith(lastName, "ic") select firstName;
 	`
-	expected := `[{'type': 'User', 'result': [{'firstName': 'Luka'}, {'firstName': 'Pera'}]}]`
+	expected := `[{"type": "User", "result": [{"firstName": "Luka"}, {"firstName": "Pera"}]}]`
 
 	testTransformFor(stream, rules, expected, t)
 }
@@ -111,9 +111,9 @@ func TestTransformLogicalExpressionsParentheses(t *testing.T) {
 	]`
 
 	rules := `
-		take all User where type == 'User' and (startswith(firstName, "Lu") or endswith(lastName, "ic")) select firstName;
+		take all User where type == "User" and (startswith(firstName, "Lu") or endswith(lastName, "ic")) select firstName;
 	`
-	expected := `[{'type': 'User', 'result': [{'firstName': 'Luka'}, {'firstName': 'Pera'}]}]`
+	expected := `[{"type": "User", "result": [{"firstName": "Luka"}, {"firstName": "Pera"}]}]`
 
 	testTransformFor(stream, rules, expected, t)
 }
@@ -127,9 +127,9 @@ func TestTransformLogicalExpressionsContains(t *testing.T) {
 	]`
 
 	rules := `
-		take all User where type == 'User' and contains(lastName, "ic") select firstName;
+		take all User where type == "User" and contains(lastName, "ic") select firstName;
 	`
-	expected := `[{'type': 'User', 'result': [{'firstName': 'Luka'}, {'firstName': 'Pera'}]}]`
+	expected := `[{"type": "User", "result": [{"firstName": "Luka"}, {"firstName": "Pera"}]}]`
 
 	testTransformFor(stream, rules, expected, t)
 }
@@ -145,7 +145,7 @@ func TestTransformLogicalExpressionsExists(t *testing.T) {
 	rules := `
 		take all User where exists(firstName) select firstName;
 	`
-	expected := `[{'type': 'User', 'result': [{'firstName': 'Luka'}, {'firstName': 'Pera'}]}]`
+	expected := `[{"type": "User", "result": [{"firstName": "Luka"}, {"firstName": "Pera"}]}]`
 
 	testTransformFor(stream, rules, expected, t)
 }
@@ -158,7 +158,7 @@ func TestTransformListElements(t *testing.T) {
 	rules := `
 		take first A where exists(list.0) select list.0 as elem;
 	`
-	expected := `[{'type': 'A', 'result': {'elem': {'a': 1}}}]`
+	expected := `[{"type": "A", "result": {"elem": {"a": 1}}}]`
 
 	testTransformFor(stream, rules, expected, t)
 }
@@ -171,7 +171,7 @@ func TestTransformRootListElements(t *testing.T) {
 	rules := `
 		take first A where exists(_.0) select _.0 as elem;
 	`
-	expected := `[{'type': 'A', 'result': {'elem': {'a': 1}}}]`
+	expected := `[{"type": "A", "result": {"elem": {"a": 1}}}]`
 
 	testTransformFor(stream, rules, expected, t)
 }
