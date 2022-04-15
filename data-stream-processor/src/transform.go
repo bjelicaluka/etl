@@ -4,7 +4,54 @@ import (
 	"fmt"
 	"os/exec"
 	"strings"
+	"time"
+
+	"github.com/go-resty/resty/v2"
 )
+
+type TransformationRulesProvider struct {
+	client *resty.Client
+	url    string
+	cache  map[string]string
+	timers map[string]*time.Timer
+}
+
+func NewProvider() *TransformationRulesProvider {
+	return &TransformationRulesProvider{
+		client: resty.New(),
+		url:    "http://localhost:8000/api/v1",
+		cache:  make(map[string]string),
+		timers: make(map[string]*time.Timer),
+	}
+}
+
+type TransformationRule struct {
+	Id    string `json:"id"`
+	Name  string `json:"name"`
+	Rules string `json:"rules"`
+}
+
+func GetRules(self *TransformationRulesProvider, transformationId string) string {
+	if timer, ok := self.timers[transformationId]; ok {
+		timer.Stop()
+	}
+	if rules, ok := self.cache[transformationId]; ok {
+		fmt.Println("CACHE")
+		return rules
+	}
+	fmt.Println("NONONONO")
+	resp, err := self.client.R().
+		SetHeader("Content-Type", "application/json").
+		SetHeader("Accept", "application/json").
+		SetResult(&TransformationRule{}).
+		Get(self.url + "/transformation-rules/" + transformationId)
+	if err != nil {
+		panic("Failed to fetch transformation rules.")
+	}
+	self.cache[transformationId] = resp.Result().(*TransformationRule).Rules
+	self.timers[transformationId] = time.AfterFunc(10*time.Second, func() { delete(self.cache, transformationId) })
+	return self.cache[transformationId]
+}
 
 var DslProjectPath = `./dsl`
 

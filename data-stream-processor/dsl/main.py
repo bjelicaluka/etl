@@ -18,4 +18,4 @@ if __name__ == "__main__":
     for statement in model.statements:
       type, result = eval_statement(statement, stream)
       results.append({ "type": type, "result": result })
-  print(results)
+  print(json.dumps(results))

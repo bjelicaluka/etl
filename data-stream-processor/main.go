@@ -1,9 +1,13 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"stream-processor/src"
 	"sync"
+	"time"
+
+	"github.com/streadway/amqp"
 )
 
 func main() {
@@ -13,23 +17,54 @@ func main() {
 	defer conn.Close()
 	defer ch.Close()
 
+	handlers := src.New().HandlersRegistry
+	transformationRulesProvider := src.NewProvider()
+
 	pool_size := 20
 	for i := 0; i < pool_size; i++ {
 		wg.Add(1)
 		go func() {
 			defer wg.Done()
-			for stream := range streams {
-				result, err := src.Transform(string(stream.Body), `
-					take all Origins where startswith(origin, '188') and contains(origin, '115') select origin as host;
-					take first Breeds where exists(message) select message.african as list;
-					take first Quote where exists(_.0) select _.0 as quote;
-				`)
+			for streamString := range streams {
+				start := time.Now()
+
+				var stream map[string]interface{}
+				_ = json.Unmarshal([]byte(streamString.Body), &stream)
+				transformation := stream["transformationId"].(string)
+				rules := src.GetRules(transformationRulesProvider, transformation)
+				result, err := src.Transform(string(stream["stream"].(string)), rules)
+				var handleWg sync.WaitGroup
+
 				if err != nil {
 					fmt.Println(err)
 					fmt.Println(result)
 				} else {
-					fmt.Println(result)
+					var transformationResults []map[string]interface{}
+					_ = json.Unmarshal([]byte(result), &transformationResults)
+
+					for _, singleResult := range transformationResults {
+						handleWg.Add(1)
+						go func(transformationResult map[string]interface{}) {
+							defer handleWg.Done()
+							marshaled, err := json.Marshal(transformationResult["result"])
+							if err == nil {
+								src.Handle(handlers[transformationResult["type"].(string)], string(marshaled))
+							}
+							fmt.Println(transformation, string(marshaled))
+						}(singleResult)
+					}
 				}
+				handleWg.Wait()
+
+				marshaledStatus, _ := json.Marshal(map[string]interface{}{
+					"type":             "StreamProcessed",
+					"transformationId": transformation,
+					"time":             time.Since(start).Milliseconds(),
+				})
+				ch.Publish("etl-status-stream", "", false, false, amqp.Publishing{
+					ContentType: "text/plain",
+					Body:        marshaledStatus,
+				})
 			}
 		}()
 	}
