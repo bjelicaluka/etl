@@ -3,11 +3,7 @@ import { IInstaller } from "../contracts/IInstaller";
 import { PubSubProvider, INamespaceProvider } from "isobarot";
 import { AMQP_CONFIG } from "../config";
 import { ETL_STATUS_EXCHANGE } from "./PublisherInstaller";
-
-type State = {
-  publishedCount: number,
-  processedCount: number,
-}
+import { TransformationStateHandler } from "../TransformationStateHandler";
 
 @injectable()
 export class SubscriberInstaller implements IInstaller {
@@ -25,40 +21,34 @@ export class SubscriberInstaller implements IInstaller {
     await subscriber.assertQueue(queue, true);
     await subscriber.bindQueue(queue, exchange, '');
 
-    const states: { [key: string]: State } = {};
-
-    const createStateIfNotExists = (transformationId: string) => {
-      if (!states[transformationId]) {
-        states[transformationId] = {
-          publishedCount: 0,
-          processedCount: 0,
-        }
-      }
-    }
-
     const eventHandlers = {
       "Liveness": (namespaceProvider: INamespaceProvider, data: any) => {
+        if(TransformationStateHandler.states[data.transformationId])
+          TransformationStateHandler.states[data.transformationId].totalCount = data.totalCount;
         namespaceProvider.getNamespace('etl-events').emit('liveness', JSON.stringify(data));
         console.log("Liveness", data);
       },
       "StreamPublished": (namespaceProvider: INamespaceProvider, data: any) => {
-        createStateIfNotExists(data.transformationId);
-        states[data.transformationId].publishedCount += 1; 
+        TransformationStateHandler.createStateIfNotExists(data.transformationId);
+        TransformationStateHandler.states[data.transformationId].publishedCount += 1; 
+        TransformationStateHandler.states[data.transformationId].totalPublishTime += data.time; 
 
-        namespaceProvider.getNamespace('etl-events').emit('process-status', JSON.stringify(states[data.transformationId]));
+        namespaceProvider.getNamespace('etl-events').emit('process-status', JSON.stringify({
+          transformationId: data.transformationId,
+          status: TransformationStateHandler.states[data.transformationId]
+        }));
         console.log("StreamPublished", data);
       },
       "StreamProcessed": (namespaceProvider: INamespaceProvider, data: any) => {
-        createStateIfNotExists(data.transformationId);
-        states[data.transformationId].processedCount += 1; 
+        TransformationStateHandler.createStateIfNotExists(data.transformationId);
+        TransformationStateHandler.states[data.transformationId].processedCount += 1;
+        TransformationStateHandler.states[data.transformationId].totalProcessTime += data.time; 
 
-        namespaceProvider.getNamespace('etl-events').emit('process-status', JSON.stringify(states[data.transformationId]));
+        namespaceProvider.getNamespace('etl-events').emit('process-status', JSON.stringify({
+          transformationId: data.transformationId,
+          status: TransformationStateHandler.states[data.transformationId]
+        }));
         console.log("StreamProcessed", data);
-      },
-      "ProcessDone": (namespaceProvider: INamespaceProvider, data: any) => {
-        delete states[data.transformationId];
-        namespaceProvider.getNamespace('etl-events').emit('process-done', JSON.stringify(data));
-        console.log("ProcessDone", data);
       },
     }
 

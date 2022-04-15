@@ -1,4 +1,5 @@
 mod core;
+use std::time::Instant;
 use serde_json::Value;
 use crate::core::contract::StreamCreator;
 use amiquip::Connection;
@@ -12,10 +13,10 @@ use serde_json::json;
 
 #[tokio::main]
 async fn main() {
-    let transformation = "Transformation-165-A";
-    let count: i64 = 10;
+    let transformation = "TransformationRules-225-A";
+    let count: i64 = 100;
 
-    let mut connection = Connection::insecure_open("amqp://p:w@bjelicaluka.com:5672").expect("Failed to connect to AMQP Broker.");
+    let mut connection = Connection::insecure_open("amqp://u:p@bjelicaluka.com:5672").expect("Failed to connect to AMQP Broker.");
     let channel = connection.open_channel(None).expect("Failed to open a channel.");
     let mut data_stream_pub = core::amqp::AmqpPublisher::new("etl-data-stream", &channel);
     let status_channel = connection.open_channel(None).expect("Failed to open a channel.");
@@ -28,15 +29,13 @@ async fn main() {
             liveness_pub.publish(&json!({
                 "type": "Liveness",
                 "transformationId": transformation,
-                "data": {
-                    "totalCount": count
-                }
+                "totalCount": count
             }).to_string());
             thread::sleep(Duration::from_secs(5));
         }
     });
 
-    let mut status_sub = core::amqp::AmqpSubscriber::new("etl-status-stream", "", &status_channel);
+    let mut status_sub = core::amqp::AmqpSubscriber::new("etl-status-stream", "etl-commands-queue", &status_channel);
 
     let consumer = status_sub.subscribe();
 
@@ -55,21 +54,21 @@ async fn main() {
             let mut stream_creator = core::http::HttpStreamCreator::new(count);
 
             loop {
+                let now = Instant::now();
                 let stream = stream_creator.next().await;
                 if stream == "" {
                     break;
                 }
-                data_stream_pub.publish(&stream);
+                data_stream_pub.publish(&json!({
+                    "stream": &stream,
+                    "transformationId": transformation,
+                }).to_string());
                 status_pub.publish(&json!({
                     "type": "StreamPublished",
                     "transformationId": transformation,
+                    "time": now.elapsed().as_millis() as u64
                 }).to_string());
             }
-            
-            status_pub.publish(&json!({
-                "type": "ProcessDone",
-                "transformationId": transformation,
-            }).to_string());
           }
           other => {
             println!("Consumer ended: {:?}", other);

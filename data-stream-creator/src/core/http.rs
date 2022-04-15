@@ -14,16 +14,15 @@ impl contract::StreamCreator for HttpStreamCreator {
   }
   
   async fn next(&mut self) -> String {
-    self.count -= 1;
     if self.count == 0 {
       return String::from("")
     }
     let stream = try_join_all([
-      http::get_async("https://httpbin.org/ip"),
-      http::get_async("https://dog.ceo/api/breeds/list/all"),
-      http::get_async("https://ron-swanson-quotes.herokuapp.com/v2/quotes")
+      http::get_async("http://httpbin.org/ip"),
+      http::get_async("http://dog.ceo/api/breeds/list/all"),
+      http::get_async("http://ron-swanson-quotes.herokuapp.com/v2/quotes")
     ]).await.expect("Failed to fetch stream data.");
-
+    self.count -= 1;
     String::from(json!(stream).to_string())
   }
 }

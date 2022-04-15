@@ -2,6 +2,7 @@ import { Server } from "http";
 import { Container, inject, injectable } from "inversify";
 import { IEventDispatcher, IEventHandler, INamespaceProvider, Publisher, SocketIOServer } from "isobarot";
 import { IInstaller } from "../contracts/IInstaller";
+import { TransformationStateHandler } from "../TransformationStateHandler";
 import { ETL_STATUS_EXCHANGE } from "./PublisherInstaller";
 
 @injectable()
@@ -28,6 +29,7 @@ export class WsEventsInstaller implements IInstaller {
 
     etlCommandsNamespace.on('connection', s => {
       s.on('process-start', transformationId => {
+        TransformationStateHandler.setInitialState(transformationId);
         const pub = this.appContainer.get<Publisher>("Publisher");
         pub.publish(ETL_STATUS_EXCHANGE, '', JSON.stringify({type: "ProcessStart", transformationId}));
       });
