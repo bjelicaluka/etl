@@ -51,7 +51,7 @@ export class SocketIOClient {
   }
 
   requestNamespaceCreation() {
-    axios.post(`${this.serviceHost}/namespaces`, { namespace: this.namespace })
+    axios.post(`${this.serviceHost}namespaces`, { namespace: this.namespace })
       .then(resp => { console.log("Namespace creation success."); this.init() })
       .catch(e => console.log('Namespace creation failed.'));
   }

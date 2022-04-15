@@ -16,7 +16,7 @@ export const EditTransformationPage = () => {
 
   useEffect(() => {
     if (isEdit) {
-      getTransformation(transformationId).then(setTransformation);
+      !transformation && getTransformation(transformationId).then(setTransformation);
     }
   }, [transformationId]);
 

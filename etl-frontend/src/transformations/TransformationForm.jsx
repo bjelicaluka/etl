@@ -57,7 +57,7 @@ export const TransformationForm = ({ isEdit, transformationRule, onSuccess = () 
               isValid={!rulesErrorMessage}
               errorMessage={rulesErrorMessage}
               onChange={c => {
-                setRules(c);
+                c !== rules && setRules(c);
                 try {
                   setRulesErrorMessage(null);
                 } catch (error) {

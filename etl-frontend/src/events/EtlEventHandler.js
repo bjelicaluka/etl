@@ -26,11 +26,4 @@ export class EtlEventHandler extends SocketIOClient {
     !this.initialized ? this.init() : this.addEventListener('process-status', this.processStatusHandler);
   }
 
-  onProcessDone(handler) {
-    this.processDoneHandler = handler;
-    this.initialized && this.clearEventListeners('process-done');
-    !this.initialized ? this.init() : this.addEventListener('process-done', this.processDoneHandler);
-    this.client.emit()
-  }
-
 }
