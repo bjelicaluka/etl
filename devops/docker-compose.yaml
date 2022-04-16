@@ -1,0 +1,76 @@
+version: "3.9"
+services:
+
+  transformation-rules-service:
+    image: transformation-rules-service
+    environment:
+      - RAVENDB_URL=http://ravendb:8080
+    ports:
+      - "8000:8000"
+
+  data-stream-processor:
+    image: data-stream-processor
+    environment:
+      - TRANSFORMATION_RULES_URL=http://transformation-rules-service:8000
+      - AMQP_URL=message-queue
+      - AMQP_PORT=5672
+      - AMQP_USERNAME=${MQ_USERNAME}
+      - AMQP_PASSWORD=${MQ_PASSWORD}
+
+  # data-stream-creator:
+  #   image: data-stream-creator
+  #   environment:
+  #     - AMQP_URL=message-queue
+  #     - AMQP_PORT=5672
+  #     - AMQP_USERNAME=${MQ_USERNAME}
+  #     - AMQP_PASSWORD=${MQ_PASSWORD}
+
+  etl-status-tracker-service:
+    image: etl-status-tracker-service
+    environment:
+      - REDIS_PASSWORD=${REDIS_PASSWORD}
+      - AMQP_USERNAME=${MQ_USERNAME}
+      - AMQP_PASSWORD=${MQ_PASSWORD}
+    ports:
+      - "8001:80"
+
+  etl-frontend:
+    image: etl-frontend
+    environment:
+      - API_PROTOCOL=http
+      - API_HOSTNAME=localhost
+      - API_PORT=8001
+      - API_PATH=/
+      - SAME_HOST=false
+    ports:
+      - "3000:3000"
+
+  ravendb:
+    image: ravendb/ravendb
+    environment:
+      - RAVEN_Security_UnsecuredAccessAllowed=PrivateNetwork
+      - RAVEN_License_Eula_Accepted=true
+      - RAVEN_Setup_Mode=None
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./ravendb_data:/opt/RavenDB/Server/RavenData
+
+  message-queue:
+    image: rabbitmq:3-management-alpine
+    environment: 
+      - RABBITMQ_DEFAULT_USER=${MQ_USERNAME}
+      - RABBITMQ_DEFAULT_PASS=${MQ_PASSWORD}
+    ports:
+      - 15672:15672
+      - 5672:5672
+
+  redis:
+    image: "redis:alpine"
+    command: redis-server /usr/local/etc/redis/redis.conf --appendonly yes
+    volumes:
+      - ./config/redis/redis.conf:/usr/local/etc/redis/redis.conf
+
+networks:
+  default:
+    driver: bridge

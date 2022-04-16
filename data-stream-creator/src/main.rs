@@ -11,12 +11,19 @@ use std::thread;
 use std::time::Duration;
 use serde_json::json;
 
+use std::env;
+
 #[tokio::main]
 async fn main() {
     let transformation = "TransformationRules-225-A";
     let count: i64 = 100;
 
-    let mut connection = Connection::insecure_open("amqp://root:isobarot1234@bjelicaluka.com:5672").expect("Failed to connect to AMQP Broker.");
+    let url = env::var("AMQP_URL").expect("AMQP_URL is not set.");
+	let port = env::var("AMQP_PORT").expect("AMQP_PORT is not set.");
+	let uname = env::var("AMQP_USERNAME").expect("AMQP_USERNAME is not set.");
+	let pwd = env::var("AMQP_PASSWORD").expect("AMQP_PASSWORD is not set.");
+
+    let mut connection = Connection::insecure_open(format!("amqp://{uname}:{pwd}@{url}:{port}")).expect("Failed to connect to AMQP Broker.");
     let channel = connection.open_channel(None).expect("Failed to open a channel.");
     let mut data_stream_pub = core::amqp::AmqpPublisher::new("etl-data-stream", &channel);
     let status_channel = connection.open_channel(None).expect("Failed to open a channel.");
