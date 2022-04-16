@@ -59,11 +59,11 @@ const LogsContainer = ({ title, logs }) => {
   );
 };
 
-const DurationsContainer = ({ isRunning, isDone, estimated, total, }) => {
+const DurationsContainer = ({ isRunning, isDone, timeRemaining, total, }) => {
 	return (
 		<div className="col-12 p-3" style={{ color: 'white'}}>
-			{(isRunning || isDone) && (
-        <div>Estimated time: {estimated} sec</div>
+			{isRunning && (
+        <div>Remaining time: {timeRemaining} sec</div>
       )}
       {isDone && <div>Total time: {total} sec</div>}
 		</div>
@@ -147,14 +147,18 @@ export function ExecutionPage() {
 	const estimatedCreationDuration = Math.round((100 * secondsPerStreamCreation) / 1000) / 100 * status.totalCount;
 
 	const secondsElapsed = (e) => Math.floor((e - start) / 1000);
-	const currentAverage = secondsElapsed(Date.now()) / ((status.processedCount + status.publishedCount)*2);
+	const timeElapsed = secondsElapsed(Date.now());
+	const currentAverage = timeElapsed / status.processedCount;
+	const totalEstimated = (estimatedProcessingDuration + estimatedCreationDuration + currentAverage * status.totalCount) / 3;
+
+	const timeRemaining = totalEstimated - timeElapsed;
   return (
     <>
       <ConnectionStatusBar isConnected={creatorOnline} />
 			<DurationsContainer
 				isDone={isDone}
 				isRunning={isRunning}
-				estimated={Math.round(100 * (estimatedProcessingDuration + estimatedCreationDuration + currentAverage)/3) / 100}
+				timeRemaining={Math.round(100 * (timeRemaining < 0 ? 0 : timeRemaining) ) / 100}
 				total={secondsElapsed(end)}
 			/>
       <ProgressBar
