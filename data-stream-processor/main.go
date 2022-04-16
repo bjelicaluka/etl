@@ -35,6 +35,7 @@ func main() {
 				result, err := src.Transform(string(stream["stream"].(string)), rules)
 				var handleWg sync.WaitGroup
 
+				resultsString := ""
 				if err != nil {
 					fmt.Println(err)
 					fmt.Println(result)
@@ -50,6 +51,7 @@ func main() {
 							if err == nil {
 								src.Handle(handlers[transformationResult["type"].(string)], string(marshaled))
 							}
+							resultsString += string(marshaled) + "\n"
 							fmt.Println(transformation, string(marshaled))
 						}(singleResult)
 					}
@@ -60,6 +62,7 @@ func main() {
 					"type":             "StreamProcessed",
 					"transformationId": transformation,
 					"time":             time.Since(start).Milliseconds(),
+					"results":          resultsString,
 				})
 				ch.Publish("etl-status-stream", "", false, false, amqp.Publishing{
 					ContentType: "text/plain",

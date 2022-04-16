@@ -35,6 +35,7 @@ export class SubscriberInstaller implements IInstaller {
 
         namespaceProvider.getNamespace('etl-events').emit('process-status', JSON.stringify({
           transformationId: data.transformationId,
+          stream: data.stream,
           status: TransformationStateHandler.states[data.transformationId]
         }));
         console.log("StreamPublished", data);
@@ -46,6 +47,7 @@ export class SubscriberInstaller implements IInstaller {
 
         namespaceProvider.getNamespace('etl-events').emit('process-status', JSON.stringify({
           transformationId: data.transformationId,
+          results: data.results,
           status: TransformationStateHandler.states[data.transformationId]
         }));
         console.log("StreamProcessed", data);
