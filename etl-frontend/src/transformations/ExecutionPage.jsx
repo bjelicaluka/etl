@@ -147,13 +147,14 @@ export function ExecutionPage() {
 	const estimatedCreationDuration = Math.round((100 * secondsPerStreamCreation) / 1000) / 100 * status.totalCount;
 
 	const secondsElapsed = (e) => Math.floor((e - start) / 1000);
+	const currentAverage = secondsElapsed(Date.now()) / ((status.processedCount + status.publishedCount)*2);
   return (
     <>
       <ConnectionStatusBar isConnected={creatorOnline} />
 			<DurationsContainer
 				isDone={isDone}
 				isRunning={isRunning}
-				estimated={Math.round(100 * (estimatedProcessingDuration + estimatedCreationDuration + secondsElapsed(Date.now()))/3) / 100}
+				estimated={Math.round(100 * (estimatedProcessingDuration + estimatedCreationDuration + currentAverage)/3) / 100}
 				total={secondsElapsed(end)}
 			/>
       <ProgressBar
