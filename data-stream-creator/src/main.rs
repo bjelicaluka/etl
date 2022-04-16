@@ -16,7 +16,7 @@ async fn main() {
     let transformation = "TransformationRules-225-A";
     let count: i64 = 100;
 
-    let mut connection = Connection::insecure_open("amqp://u:p@bjelicaluka.com:5672").expect("Failed to connect to AMQP Broker.");
+    let mut connection = Connection::insecure_open("amqp://root:isobarot1234@bjelicaluka.com:5672").expect("Failed to connect to AMQP Broker.");
     let channel = connection.open_channel(None).expect("Failed to open a channel.");
     let mut data_stream_pub = core::amqp::AmqpPublisher::new("etl-data-stream", &channel);
     let status_channel = connection.open_channel(None).expect("Failed to open a channel.");
@@ -51,7 +51,7 @@ async fn main() {
             if v["type"] != "ProcessStart" || v["transformationId"] != transformation {
                 continue;
             }
-            let mut stream_creator = core::http::HttpStreamCreator::new(count);
+            let mut stream_creator = core::stream_creators::HttpStreamCreator::new(count);
 
             loop {
                 let now = Instant::now();
@@ -66,7 +66,8 @@ async fn main() {
                 status_pub.publish(&json!({
                     "type": "StreamPublished",
                     "transformationId": transformation,
-                    "time": now.elapsed().as_millis() as u64
+                    "time": now.elapsed().as_millis() as u64,
+                    "stream": &stream
                 }).to_string());
             }
           }
