@@ -2,6 +2,7 @@ package src
 
 import (
 	"fmt"
+	"os"
 	"os/exec"
 	"strings"
 	"time"
@@ -19,7 +20,7 @@ type TransformationRulesProvider struct {
 func NewProvider() *TransformationRulesProvider {
 	return &TransformationRulesProvider{
 		client: resty.New(),
-		url:    "http://localhost:8000/api/v1",
+		url:    os.Getenv("TRANSFORMATION_RULES_URL") + "/api/v1",
 		cache:  make(map[string]string),
 		timers: make(map[string]*time.Timer),
 	}
@@ -36,10 +37,8 @@ func GetRules(self *TransformationRulesProvider, transformationId string) string
 		timer.Stop()
 	}
 	if rules, ok := self.cache[transformationId]; ok {
-		fmt.Println("CACHE")
 		return rules
 	}
-	fmt.Println("NONONONO")
 	resp, err := self.client.R().
 		SetHeader("Content-Type", "application/json").
 		SetHeader("Accept", "application/json").

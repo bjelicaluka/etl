@@ -1,7 +1,9 @@
 package src
 
 import (
+	"fmt"
 	"log"
+	"os"
 
 	"github.com/streadway/amqp"
 )
@@ -13,7 +15,11 @@ func failOnError(err error, msg string) {
 }
 
 func InitChannel() (*amqp.Connection, *amqp.Channel, <-chan amqp.Delivery) {
-	conn, err := amqp.Dial("amqp://root:isobarot1234@bjelicaluka.com:5672")
+	url := os.Getenv("AMQP_URL")
+	port := os.Getenv("AMQP_PORT")
+	uname := os.Getenv("AMQP_USERNAME")
+	pwd := os.Getenv("AMQP_PASSWORD")
+	conn, err := amqp.Dial(fmt.Sprintf("amqp://%s:%s@%s:%s", url, port, uname, pwd))
 	failOnError(err, "Failed to connect to RabbitMQ")
 
 	ch, err := conn.Channel()
