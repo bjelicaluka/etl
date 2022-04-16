@@ -17,4 +17,4 @@ COPY --from=build app/build ./
 
 RUN npm ci --production
 
-CMD ["node", "src"]
+CMD ["node", "."]

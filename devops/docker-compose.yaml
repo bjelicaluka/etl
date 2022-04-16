@@ -13,17 +13,18 @@ services:
     environment:
       - TRANSFORMATION_RULES_URL=http://transformation-rules-service:8000
       - AMQP_URL=message-queue
-      - AMQP_PORT=5672
+      - AMQP_PORT5672
       - AMQP_USERNAME=${MQ_USERNAME}
       - AMQP_PASSWORD=${MQ_PASSWORD}
 
-  # data-stream-creator:
-  #   image: data-stream-creator
-  #   environment:
-  #     - AMQP_URL=message-queue
-  #     - AMQP_PORT=5672
-  #     - AMQP_USERNAME=${MQ_USERNAME}
-  #     - AMQP_PASSWORD=${MQ_PASSWORD}
+  data-stream-creator:
+    image: data-stream-creator
+    environment:
+      - TRANSFORMATION_ID=TransformationRules-1-A
+      - AMQP_URL=message-queue
+      - AMQP_PORT=5672
+      - AMQP_USERNAME=${MQ_USERNAME}
+      - AMQP_PASSWORD=${MQ_PASSWORD}
 
   etl-status-tracker-service:
     image: etl-status-tracker-service
@@ -31,11 +32,14 @@ services:
       - REDIS_PASSWORD=${REDIS_PASSWORD}
       - AMQP_USERNAME=${MQ_USERNAME}
       - AMQP_PASSWORD=${MQ_PASSWORD}
+    volumes: 
+      - ./config/status-tracker:/app/config
     ports:
       - "8001:80"
 
   etl-frontend:
     image: etl-frontend
+    command: "nginx -g \"daemon off;\""
     environment:
       - API_PROTOCOL=http
       - API_HOSTNAME=localhost
@@ -43,7 +47,7 @@ services:
       - API_PATH=/
       - SAME_HOST=false
     ports:
-      - "3000:3000"
+      - "3000:80"
 
   ravendb:
     image: ravendb/ravendb

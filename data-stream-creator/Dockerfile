@@ -1,6 +1,9 @@
-FROM rust:alpine
+FROM rust
 
 COPY ./ ./
+
+RUN apt update
+RUN apt install pkg-config
 
 RUN cargo build --release
 

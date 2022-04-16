@@ -19,7 +19,7 @@ func InitChannel() (*amqp.Connection, *amqp.Channel, <-chan amqp.Delivery) {
 	port := os.Getenv("AMQP_PORT")
 	uname := os.Getenv("AMQP_USERNAME")
 	pwd := os.Getenv("AMQP_PASSWORD")
-	conn, err := amqp.Dial(fmt.Sprintf("amqp://%s:%s@%s:%s", url, port, uname, pwd))
+	conn, err := amqp.Dial(fmt.Sprintf("amqp://%s:%s@%s:%s", uname, pwd, url, port))
 	failOnError(err, "Failed to connect to RabbitMQ")
 
 	ch, err := conn.Channel()
