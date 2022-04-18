@@ -11,7 +11,19 @@ TakeOperation:
 ;
 
 MappedProperty:
-  src=Property 'as' target=Property | src=Property
+  ('('src=MultiExp')'|src=Property) 'as' target=Property | src=Property
+;
+
+MultiExp:
+  left=Exp op=Op right=Exp | exp=Exp
+;
+
+Exp:
+  '(' mexp=MultiExp ')' | (left=Property|leftLit=Literal) op=Op rexp=Exp | (left=Property|leftLit=Literal) op=Op (right=Property|rightLit=Literal)
+;
+
+Op:
+  '/'|'*'|'+'|'-'
 ;
 
 Property:

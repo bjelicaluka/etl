@@ -10,12 +10,18 @@ def eval_statement(statement, stream):
       continue
     for prop in statement.props:
       target = prop.target if prop.target is not None else prop.src
-      dynamic_set(target, result, dynamic_access(prop.src, obj))
+      dynamic_set(target, result, eval_multi_exp(prop.src, obj))
     if op == "last" or op == "first":
       return statement.target, result
     results.append(result)
   return statement.target, results
 
+op_registry = {
+  "+": lambda a, b: a + b,
+  "-": lambda a, b: a - b,
+  "*": lambda a, b: a * b,
+  "/": lambda a, b: a / b,
+}
 
 rel_op_registry = {
   "==": lambda a, b: a == b,
@@ -66,6 +72,25 @@ built_in_fn_registry = {
   "exists": exists,
 }
 
+
+def eval_multi_exp(exp, obj):
+  if type(exp) is str:
+    return eval_exp(exp, obj)
+  elif exp.exp is not None:
+    return eval_exp(exp.exp, obj)
+  else:
+    return op_registry[exp.op](eval_exp(exp.left, obj), eval_exp(exp.right, obj))
+
+
+def eval_exp(exp, obj):
+  if type(exp) is str:
+    return dynamic_access(exp, obj)
+  elif exp.mexp is not None:
+    return eval_multi_exp(exp.mexp, obj)
+  elif exp.rexp is not None:
+    return op_registry[exp.op](eval_operand(exp.left, exp.leftLit, obj), eval_exp(exp.rexp, obj))
+  else:
+    return op_registry[exp.op](eval_operand(exp.left, exp.leftLit, obj), eval_operand(exp.right, exp.rightLit, obj))
 
 def eval_multi_log_exp(exp, obj):
   if exp.exp is not None:

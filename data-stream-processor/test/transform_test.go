@@ -176,6 +176,19 @@ func TestTransformRootListElements(t *testing.T) {
 	testTransformFor(stream, rules, expected, t)
 }
 
+func TestTransformExpression(t *testing.T) {
+	stream := `[
+		{"firstName": "Luka", "lastName": "Bjelica", "type": "User", "age": 22}
+	]`
+
+	rules := `
+		take first User where type == "User" and age > 21 select (firstName + " " + lastName) as fullName, (age * (2 + 2) / (4 / 2)) as doubleAge;
+	`
+	expected := `[{"type": "User", "result": {"fullName": "Luka Bjelica", "doubleAge": 44.0}}]`
+
+	testTransformFor(stream, rules, expected, t)
+}
+
 func testTransformFor(stream string, rules string, expected string, t *testing.T) {
 	src.DslProjectPath = "../dsl"
 
