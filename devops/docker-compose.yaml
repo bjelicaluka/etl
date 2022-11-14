@@ -19,7 +19,7 @@ services:
       - AMQP_USERNAME=${MQ_USERNAME}
       - AMQP_PASSWORD=${MQ_PASSWORD}
     depends_on:
-      - message-broker
+      - message-queue
 
   data-stream-creator:
     image: data-stream-creator
@@ -30,7 +30,7 @@ services:
       - AMQP_USERNAME=${MQ_USERNAME}
       - AMQP_PASSWORD=${MQ_PASSWORD}
     depends_on:
-      - message-broker
+      - message-queue
 
   etl-status-tracker-service:
     image: etl-status-tracker-service
@@ -44,7 +44,7 @@ services:
       - "8001:80"
     depends_on:
       - redis
-      - message-broker
+      - message-queue
 
   etl-frontend:
     image: etl-frontend

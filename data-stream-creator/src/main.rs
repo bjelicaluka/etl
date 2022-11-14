@@ -16,7 +16,7 @@ use std::env;
 #[tokio::main]
 async fn main() {
     let transformation = env::var("TRANSFORMATION_ID").unwrap();
-    let count: i64 = 100;
+    let count: i64 = 300;
 
     let url = env::var("AMQP_URL").expect("AMQP_URL is not set.");
 	let port = env::var("AMQP_PORT").expect("AMQP_PORT is not set.");
@@ -39,7 +39,7 @@ async fn main() {
                 "transformationId": transformation_id,
                 "totalCount": count
             }).to_string());
-            thread::sleep(Duration::from_secs(5));
+            thread::sleep(Duration::from_secs(1));
         }
     });
 
